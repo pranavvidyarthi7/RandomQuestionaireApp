@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'dart:math';
 
 void main() => runApp(Quizzler());
 
@@ -26,8 +27,23 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  int i = 0;
-  int score = 0;
+  int i = Random().nextInt(12) + 1;
+  int score = 0, a = 1;
+  List<String> QuestionBank = [
+    'You can lead a cow down stairs but not up stairs.',
+    'Approximately one quarter of human bones are in the feet.',
+    'A slug\'s blood is green.',
+    'Some cats are actually allergic to humans',
+    'Buzz Aldrin\'s mother\'s maiden name was \"Moon\".',
+    'It is illegal to pee in the Ocean in Portugal.',
+    'No piece of square dry paper can be folded in half more than 7 times.',
+    'In London, UK, if you happen to die in the House of Parliament, you are technically entitled to a state funeral, because the building is considered too sacred a place.',
+    'The loudest sound produced by any animal is 188 decibels. That animal is the African Elephant.',
+    'The total surface area of two human lungs is approximately 70 square metres.',
+    'Google was originally called \"Backrub\".',
+    'Chocolate affects a dog\'s heart and nervous system; a few ounces are enough to kill a small dog.',
+    'In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.',
+  ];
   List<String> Questions = [
     'You can lead a cow down stairs but not up stairs.',
     'Approximately one quarter of human bones are in the feet.',
@@ -42,6 +58,21 @@ class _QuizPageState extends State<QuizPage> {
     'Google was originally called \"Backrub\".',
     'Chocolate affects a dog\'s heart and nervous system; a few ounces are enough to kill a small dog.',
     'In West Virginia, USA, if you accidentally hit an animal with your car, you are free to take it home to eat.',
+  ];
+  List<bool> SOLUTIONS = [
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
   ];
   List<bool> Answers = [
     false,
@@ -60,7 +91,7 @@ class _QuizPageState extends State<QuizPage> {
   ];
   void check(bool sol) {
     if (sol == Answers[i]) {
-      if (i < 12) {
+      if (a < 7) {
         setState(() {
           score++;
           ScoreKeeper.add(
@@ -69,12 +100,19 @@ class _QuizPageState extends State<QuizPage> {
               color: Colors.green,
             ),
           );
-          i = i + 1;
+          if (a != 6) {
+            Questions.remove(
+              Questions[i],
+            );
+            Answers.remove(
+              Answers[i],
+            );
+            i = Random().nextInt(Questions.length - 1) + 1;
+          }
         });
       }
-      ;
     } else {
-      if (i < 12) {
+      if (a < 7) {
         setState(() {
           ScoreKeeper.add(
             Icon(
@@ -82,17 +120,24 @@ class _QuizPageState extends State<QuizPage> {
               color: Colors.red,
             ),
           );
-          i = i + 1;
+          if (a != 6) {
+            Questions.remove(
+              Questions[i],
+            );
+            Answers.remove(
+              Answers[i],
+            );
+            i = Random().nextInt(Questions.length - 1) + 1;
+          }
         });
       }
-      ;
     }
-    if (i == 12) {
+    if (a == 6) {
       setState(() {
         Alert(
           context: context,
           title: "Your Score",
-          desc: "$score/13",
+          desc: "$score/6",
           style: AlertStyle(
             descStyle: TextStyle(
               color: Colors.green,
@@ -108,9 +153,12 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 setState(() {
-                  score = 0;
-                  i = 0;
                   ScoreKeeper = [];
+                  Answers.addAll(SOLUTIONS);
+                  Questions.addAll(QuestionBank);
+                  a = 1;
+                  score = 0;
+                  i = Random().nextInt(Questions.length - 1) + 1;
                 });
                 Navigator.pop(context);
               },
@@ -161,6 +209,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 check(true);
+                a++;
               },
             ),
           ),
@@ -179,11 +228,13 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 check(false);
+                a++;
               },
             ),
           ),
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: ScoreKeeper,
         ),
       ],
